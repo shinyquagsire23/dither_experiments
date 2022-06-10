@@ -5,13 +5,13 @@ import cv2
 import random
 
 # image path
-path = 'input.png'
+path = 'input_david.png'
 image = cv2.imread(path)
 
 window_name = 'image'
 
-TARGET_BITS = 4
-TARGET_CHANNELS = 3
+TARGET_BITS = 2
+TARGET_CHANNELS = 1
 
 def clamp(val,a,b):
     if val < a:
@@ -130,12 +130,15 @@ def alter_image(image, fs):
     bits = np.array([TARGET_BITS,TARGET_BITS,TARGET_BITS])
     error_bits = np.array([TARGET_BITS,TARGET_BITS,TARGET_BITS]) # The lower the BPP, the higher this should be probably
 
+    if TARGET_BITS == 2 and TARGET_CHANNELS == 1:
+        error_bits = np.array([TARGET_BITS*3,TARGET_BITS*3,TARGET_BITS*3])
+
     for y in range(0, image.shape[0]):
         #error = [random.randrange(0, (1<<bits[0])-1, 1),random.randrange(0, (1<<bits[1])-1, 1),random.randrange(0, (1<<bits[2])-1, 1)]
         #error = [random.randrange(-127, 127, 1),random.randrange(-127, 127, 1),random.randrange(-127, 127, 1)]
 
-        #error = [random.randrange(-((1<<(error_bits[0]+1))-1), (1<<(error_bits[0]+1))-1, 1),random.randrange(-((1<<(error_bits[1]+1))-1), (1<<(error_bits[1]+1))-1, 1),random.randrange(-((1<<(error_bits[2]+1))-1), (1<<(error_bits[2]+1))-1, 1)]
-        error = [0,0,0]
+        error = [random.randrange(-((1<<(error_bits[0]+1))-1), (1<<(error_bits[0]+1))-1, 1),random.randrange(-((1<<(error_bits[1]+1))-1), (1<<(error_bits[1]+1))-1, 1),random.randrange(-((1<<(error_bits[2]+1))-1), (1<<(error_bits[2]+1))-1, 1)]
+        #error = [0,0,0]
         if TARGET_CHANNELS == 1:
             error[1] = error[0]
             error[2] = error[0]
@@ -151,12 +154,15 @@ def alter_image(image, fs):
 
             c = image[y,x,:]
 
+            # Edge-based error rand. Kinda sucks.
+            '''
             diff = last_c - c
             if diff[0]+diff[1]+diff[2] > 128:
                 error = [random.randrange(-((1<<(error_bits[0]+1))-1), (1<<(error_bits[0]+1))-1, 1),random.randrange(-((1<<(error_bits[1]+1))-1), (1<<(error_bits[1]+1))-1, 1),random.randrange(-((1<<(error_bits[2]+1))-1), (1<<(error_bits[2]+1))-1, 1)]
                 if TARGET_CHANNELS == 1:
                     error[1] = error[0]
                     error[2] = error[0]
+            '''
 
             c_new_nodither = alter_pixel_dsarb_nodither(c, bits)
             c_new, error = alter_pixel_dsarb(c, error, bits)
@@ -171,7 +177,7 @@ def alter_image(image, fs):
 images = []
 image_fs = fs_dither(image, 1<<TARGET_BITS)
 
-for i in range(0, 60):
+for i in range(0, 4):
     images += [alter_image(image,image_fs)]
     print (i)
 
