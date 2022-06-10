@@ -5,13 +5,13 @@ import cv2
 import random
 
 # image path
-path = 'input_david.png'
+path = 'input.png'
 image = cv2.imread(path)
 
 window_name = 'image'
 
-TARGET_BITS = 2
-TARGET_CHANNELS = 1
+TARGET_BITS = 4
+TARGET_CHANNELS = 3
 
 def clamp(val,a,b):
     if val < a:
@@ -177,7 +177,7 @@ def alter_image(image, fs):
 images = []
 image_fs = fs_dither(image, 1<<TARGET_BITS)
 
-for i in range(0, 4):
+for i in range(0, 10):
     images += [alter_image(image,image_fs)]
     print (i)
 
